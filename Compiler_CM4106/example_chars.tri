@@ -1,0 +1,19 @@
+$this is an example program
+let
+	MAX ~ 10,
+	n1: Integer
+in
+	begin
+		put("e"), put("n"), put("t"), put("e"), put("r"), put(" "),
+		put("n"), put("u"), put("m"), put("b"), put("e"), put("r"), put(">"),
+		getint(var n1),
+		if n1 > 0 then
+			if n1 < MAX then
+				while n1 > 0 do
+					begin
+						putint(n1), puteol(),
+						n1 becomes n1-1
+					end
+			else
+		else
+	end
