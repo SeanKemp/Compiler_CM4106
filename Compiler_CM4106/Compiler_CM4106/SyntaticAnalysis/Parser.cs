@@ -120,7 +120,7 @@ namespace Compiler.SyntacticAnalysis
             switch (CurrentToken.Type)
             {
                 case Nothing:
-                    ParseBlankCommand();
+                    ParseNothingCommand();
                     break;
                 case Identifier:
                     ParseAssignmentOrCallCommand();
@@ -146,9 +146,10 @@ namespace Compiler.SyntacticAnalysis
             }
         }
 
-        private void ParseBlankCommand()
+        private void ParseNothingCommand() // 
         {
-            Debugger.Write("Parsing Blank Command");
+            Debugger.Write("Parsing Nothing Command");
+            Accept(Nothing);
             //Position pos = CurrentToken.Position;
             //return new BlankCommandNode(pos);
         }
@@ -320,115 +321,128 @@ namespace Compiler.SyntacticAnalysis
             //return new VarDeclarationNode(identifier, typeDenoter, pos);
         }
 
-        private IParameterNode ParseParameter()
+        private void ParseParameter()
         {
             Debugger.Write("Parsing Parameter");
-            Position pos = CurrentToken.Position;
-            if (CurrentToken.Type == RightBracket) return new BlankParameterNode(pos);
+            //Position pos = CurrentToken.Position;
+            if (CurrentToken.Type == RightBracket) ; //return new BlankParameterNode(pos);
             else if (CurrentToken.Type == Var)
             {
                 Accept(Var);
-                VarParameterNode varParameter =  new VarParameterNode(ParseIdentifier(), pos);
-                return varParameter;
+                ParseIdentifier();
+                //VarParameterNode varParameter = new VarParameterNode(ParseIdentifier(), pos);
+                //return varParameter;
             }
             else
             {
-                return new ExpressionParameterNode(ParseExpression());
+                ParseExpression();
+                //return new ExpressionParameterNode(ParseExpression());
             }
+        }
+
+        private void ParseTypeDenoter()
+        {
+            Debugger.Write("Parsing Type Denoter");
+            ParseIdentifier();
+            //TypeDenoterNode typeDenoter = new TypeDenoterNode(ParseIdentifier());
+            //return typeDenoter;
         }
 
         /// <summary>
         /// Parses an expression
         /// </summary>
-        private IExpressionNode ParseExpression()
+        private void ParseExpression()
         {
             Debugger.Write("Parsing Expression");
-            IExpressionNode expression = ParsePrimaryExpression();
+            //IExpressionNode expression = 
+            ParsePrimaryExpression();
             while (CurrentToken.Type == Operator)
             {
-                OperatorNode oper = ParseOperator();
-                IExpressionNode rightExpression = ParsePrimaryExpression();
-                expression = new BinaryExpressionNode(expression, oper, rightExpression);
+                //OperatorNode oper = 
+                ParseOperator();
+                //IExpressionNode rightExpression = 
+                ParsePrimaryExpression();
+                //expression = new BinaryExpressionNode(expression, oper, rightExpression);
             }
-            return expression;
+            //return expression;
         }
 
-        private IExpressionNode ParsePrimaryExpression()
+        private void ParsePrimaryExpression()
         {
             Debugger.Write("Parsing Primary Expression");
-            Position pos = CurrentToken.Position;
+            //Position pos = CurrentToken.Position;
             switch (CurrentToken.Type)
             {
                 case IntLiteral:
-                    return new IntegerExpressionNode(ParseIntLiteral());
+                    ParseIntLiteral();
+                    break;
+                    //return new IntegerExpressionNode(ParseIntLiteral());
                 case CharLiteral:
-                    return new CharacterExpressionNode(ParseCharLiteral());
+                    //return new CharacterExpressionNode(ParseCharLiteral());
+                    ParseCharLiteral();
+                    break;
                 case Identifier:
-                    return new IdExpressionNode(ParseIdentifier());
+                    //return new IdExpressionNode(ParseIdentifier());
+                    ParseIdentifier();
+                    if (CurrentToken.Type == LeftBracket) // New
+                    {
+                        Accept(LeftBracket);
+                        ParseParameter();
+                        Accept(RightBracket);
+                    }
+                    break;
                 case Operator:
-                    return new UnaryExpressionNode(ParseOperator(), ParsePrimaryExpression());
+                    //return new UnaryExpressionNode(ParseOperator(), ParsePrimaryExpression());
+                    ParseOperator();
+                    ParsePrimaryExpression();
+                    break;
                 case LeftBracket:
                     Accept(LeftBracket);
-                    IExpressionNode expression = ParseExpression();
+                    //IExpressionNode expression = 
+                    ParseExpression();
                     Accept(RightBracket);
-                    return expression;
+                    //return expression;
+                    break;
                 default:
                     Reporter.RecordError($"Token is not the expected token when Parsing Primary Expression: '{CurrentToken.Spelling}'", CurrentToken.Position);
-                    return new ErrorNode(pos);
+                    //return new ErrorNode(pos);
+                    break;
             }
         }
 
-        private IExpressionNode ParseBracketExpression()
-        {
-            Debugger.Write("Parsing Bracket Expression");
-            Accept(LeftBracket);
-            IExpressionNode expression = ParseExpression();
-            Accept(RightBracket);
-            return expression;
-        }
-
-        
-
-        private TypeDenoterNode ParseTypeDenoter()
-        {
-            Debugger.Write("Parsing Type Denoter");
-            TypeDenoterNode typeDenoter = new TypeDenoterNode(ParseIdentifier());
-            return typeDenoter;
-        }
-
-        private OperatorNode ParseOperator()
+        private void ParseOperator()
         {
             Debugger.Write("Parsing operator");
-            Token OperatorToken = CurrentToken;
+            //Token OperatorToken = CurrentToken;
             Accept(Operator);
-            return new OperatorNode(OperatorToken);
+            //return new OperatorNode(OperatorToken);
         }
 
-        private IntegerLiteralNode ParseIntLiteral()
+        private void ParseIntLiteral()
         {
             Debugger.Write("Parsing integer literal");
-            Token IntLitToken = CurrentToken;
+            //Token IntLitToken = CurrentToken;
             Accept(IntLiteral);
-            return new IntegerLiteralNode(IntLitToken);
+            //return new IntegerLiteralNode(IntLitToken);
         }
 
-        private CharacterLiteralNode ParseCharLiteral()
+        private void ParseCharLiteral()
         {
             Debugger.Write("Parsing character literal");
-            Token CharLitToken = CurrentToken;
+            //Token CharLitToken = CurrentToken;
             Accept(CharLiteral);
-            return new CharacterLiteralNode(CharLitToken);
+            //return new CharacterLiteralNode(CharLitToken);
         }
 
         /// <summary>
         /// Parses an identifier
         /// </summary>
-        private IdentifierNode ParseIdentifier()
+        private void ParseIdentifier()
         {
             Debugger.Write("Parsing identifier");
-            Token IdentifierToken = CurrentToken;
+            //Token IdentifierToken = CurrentToken;
             Accept(Identifier);
-            return new IdentifierNode(IdentifierToken);
+            //return new IdentifierNode(IdentifierToken);
         }
     }
 }

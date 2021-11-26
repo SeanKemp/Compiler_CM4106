@@ -14,6 +14,6 @@ in
 						putint(n1), puteol(),
 						n1 becomes n1-1
 					end
-			else
-		else
+			else nothing
+		else nothing
 	end
