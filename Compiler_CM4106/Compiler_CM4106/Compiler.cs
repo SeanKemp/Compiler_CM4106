@@ -1,6 +1,6 @@
-﻿//using Compiler.CodeGeneration;
+﻿using Compiler.CodeGeneration;
 using Compiler.IO;
-//using Compiler.Nodes;
+using Compiler.Nodes;
 //using Compiler.SemanticAnalysis;
 using Compiler.SyntacticAnalysis;
 using Compiler.Tokenization;
@@ -87,11 +87,10 @@ namespace Compiler
 
             // Parse
             Write("Parsing...");
-            //ProgramNode tree = 
-            Parser.Parse(tokens);
+            ProgramNode tree = Parser.Parse(tokens);
             if (Reporter.HasErrors) return;
             WriteLine("Done");
-            //WriteLine(TreePrinter.ToString(tree));
+            WriteLine(TreePrinter.ToString(tree));
 
             //// Identify
             //Write("Identifying...");

@@ -1,6 +1,6 @@
 ﻿using Compiler.IO;
 using Compiler.Tokenization;
-//using Compiler.Nodes;
+using Compiler.Nodes;
 using System;
 using System.Collections.Generic;
 using static Compiler.Tokenization.TokenType;
@@ -71,378 +71,324 @@ namespace Compiler.SyntacticAnalysis
         /// Parses a program
         /// </summary>
         /// <param name="tokens">The tokens to parse</param>
-        public void Parse(List<Token> tokens)
+        public ProgramNode Parse(List<Token> tokens)
         {
             this.tokens = tokens;
-            //ProgramNode program = 
-            ParseProgram();
-            //return program;
+            ProgramNode program = ParseProgram();
+            return program;
         }
 
         /// <summary>
         /// Parses a program
         /// </summary>
-        private void ParseProgram()
+        private ProgramNode ParseProgram()
         {
             Debugger.Write("Parsing program");
-            //ICommandNode command = 
-            ParseCommand();
-            //return new ProgramNode(command);
+            ICommandNode command = ParseCommand();
+            return new ProgramNode(command);
         }
 
         /// <summary>
         /// Parses a command
         /// </summary>
-        private void ParseCommand()
+        private ICommandNode ParseCommand()
         {
             Debugger.Write("Parsing command");
-            //List<ICommandNode> commands = new List<ICommandNode>();
-            //commands.Add(ParseSingleCommand());
-            ParseSingleCommand();
+            List<ICommandNode> commands = new List<ICommandNode>();
+            commands.Add(ParseSingleCommand());
             while (CurrentToken.Type == Comma) // Changed from semicolon to comma
             {
                 Accept(Comma);
-                ParseSingleCommand();
-                //commands.Add(ParseSingleCommand());
+                commands.Add(ParseSingleCommand());
             }
-            //if (commands.Count == 1)
-            //    return commands[0];
-            //else
-            //    return new SequentialCommandNode(commands);
+            if (commands.Count == 1)
+                return commands[0];
+            else
+                return new SequentialCommandNode(commands);
         }
 
         /// <summary>
         /// Parses a single command
         /// </summary>
-        private void ParseSingleCommand() // Uses nothing terminal instead of allowing blank commands
+        private ICommandNode ParseSingleCommand() // Uses nothing terminal instead of allowing blank commands
         {
             Debugger.Write("Parsing Single Command");
             switch (CurrentToken.Type)
             {
                 case Nothing:
-                    ParseNothingCommand();
-                    break;
+                    return ParseNothingCommand();
                 case Identifier:
-                    ParseAssignmentOrCallCommand();
-                    break;
+                    return ParseAssignmentOrCallCommand();
                 case If:
-                    ParseIfCommand();
-                    break;
+                    return ParseIfCommand();
                 case While:
-                    ParseWhileOrForeverCommand();
-                    break;
+                    return ParseWhileOrForeverCommand();
                 case For:
-                    ParseForCommand();
-                    break;
+                    return ParseForCommand();
                 case Let:
-                    ParseLetCommand();
-                    break;
+                    return ParseLetCommand();
                 case Begin:
-                    ParseBeginCommand();
-                    break;                
+                    return ParseBeginCommand();            
                 default:
                     Reporter.RecordError("Token in Single Command is not recognised or blank", CurrentToken.Position);
-                    break;
+                    return new ErrorNode(CurrentToken.Position);
             }
         }
 
-        private void ParseNothingCommand() // 
+        private NothingCommandNode ParseNothingCommand() // New
         {
             Debugger.Write("Parsing Nothing Command");
             Accept(Nothing);
-            //Position pos = CurrentToken.Position;
-            //return new BlankCommandNode(pos);
+            return new NothingCommandNode(CurrentToken.Position);
         }
 
         /// <summary>
         /// Parses an assignment or call command
         /// </summary>
-        private void ParseAssignmentOrCallCommand()
+        private ICommandNode ParseAssignmentOrCallCommand()
         {
             Debugger.Write("Parsing Assignment Command or Call Command");
-            //IdentifierNode identifier = 
-            ParseIdentifier();
+            IdentifierNode identifier = ParseIdentifier();
             switch (CurrentToken.Type)
             {
                 case Becomes:
                     Debugger.Write("Parsing Assignment Command");
                     Accept(Becomes);
-                    //IExpressionNode expression = 
-                    ParseExpression();
-                    break;
-                    //return new AssignCommandNode(identifier, expression);
+                    IExpressionNode expression = ParseExpression();
+                    return new AssignCommandNode(identifier, expression);
                 case LeftBracket:
                     Debugger.Write("Parsing Call Command");
                     Accept(LeftBracket);
-                    //IParameterNode parameter = 
-                    ParseParameter();
+                    IParameterNode parameter = ParseParameter();
                     Accept(RightBracket);
-                    break;
-                    //return new CallCommandNode(identifier, parameter);
+                    return new CallCommandNode(identifier, parameter);
                 default:
-                    Reporter.RecordError($"Token is not the expected token when Parsing Assignment Command or Call Command: '{CurrentToken.Spelling}'", CurrentToken.Position);
-                    break;
-                    //return new ErrorNode(CurrentToken.Position);
+                    Reporter.RecordError("Token is not the expected token when Parsing Assignment Command or " +
+                        $"Call Command: '{CurrentToken.Spelling}'", CurrentToken.Position);
+                    return new ErrorNode(CurrentToken.Position);
             }
             
         }
 
-        private void ParseIfCommand()
+        private IfCommandNode ParseIfCommand()
         {
             Debugger.Write("Parsing If Command");
-            //Position pos = CurrentToken.Position;
+            Position pos = CurrentToken.Position;
             Accept(If);
-            //IExpressionNode expression = 
-            ParseExpression();
+            IExpressionNode expression = ParseExpression();
             Accept(Then);
-            //ICommandNode thenCommand = 
-            ParseSingleCommand();
+            ICommandNode thenCommand = ParseSingleCommand();
             Accept(Else);
-            //ICommandNode elseCommand = 
-            ParseSingleCommand();
-            //return new IfCommandNode(expression, thenCommand, elseCommand, pos);
+            ICommandNode elseCommand = ParseSingleCommand();
+            return new IfCommandNode(expression, thenCommand, elseCommand, pos);
         }
 
-        private void ParseWhileOrForeverCommand()
+        private ICommandNode ParseWhileOrForeverCommand()
         {
-            Debugger.Write("Parsing While Command");
-            //Position pos = CurrentToken.Position;
+            Debugger.Write("Parsing While or While Forever Command");
+            Position pos = CurrentToken.Position;
             Accept(While);
             if (CurrentToken.Type != Forever) // New
             {
-                //IExpressionNode expression = 
-                ParseExpression();
+                IExpressionNode expression = ParseExpression();
+                Accept(Do);
+                return new WhileCommandNode(expression, ParseSingleCommand(), pos);
             }
-            else Accept(Forever);
-
-            Accept(Do);
-            //ICommandNode command = 
-            ParseSingleCommand();
-            //return new WhileCommandNode(expression, command, pos);
+            else 
+            {
+                Accept(Forever);
+                Accept(Do);
+                return new WhileForeverCommandNode(ParseSingleCommand(), pos);
+            }
         }
 
-        private void ParseForCommand() // New
+        private ForCommandNode ParseForCommand() // New
         {
             Debugger.Write("Parsing For Command");
+            Position pos = CurrentToken.Position;
             Accept(For);
             Accept(LeftBracket);
-            ParseSingleCommand();
+            ICommandNode firstCommand = ParseSingleCommand();
             Accept(Comma);
-            ParseExpression();
+            IExpressionNode expression = ParseExpression();
             Accept(Comma);
-            ParseSingleCommand();
+            ICommandNode secondCommand = ParseSingleCommand();
             Accept(RightBracket);
             Accept(Do);
-            ParseSingleCommand();
-
+            ICommandNode doCommand = ParseSingleCommand();
+            return new ForCommandNode(firstCommand, expression, secondCommand, doCommand, pos);
         }
 
-            private void ParseLetCommand()
+            private LetCommandNode ParseLetCommand()
         {
             Debugger.Write("Parsing Let Command");
-            //Position pos = CurrentToken.Position;
+            Position pos = CurrentToken.Position;
             Accept(Let);
-            //IDeclarationNode declaration = 
-            ParseDeclaration();
+            IDeclarationNode declaration = ParseDeclaration();
             Accept(In);
-            //ICommandNode command = 
-            ParseSingleCommand();
-            //return new LetCommandNode(declaration, command, pos);
+            ICommandNode command = ParseSingleCommand();
+            return new LetCommandNode(declaration, command, pos);
         }
 
         /// <summary>
         /// Parses a begin command
         /// </summary>
-        private void ParseBeginCommand()
+        private ICommandNode ParseBeginCommand()
         {
             Debugger.Write("Parsing Begin Command");
             Accept(Begin);
-            //ICommandNode command = 
-            ParseCommand();
+            ICommandNode command = ParseCommand();
             Accept(End);
-            //return command;
+            return command;
         }
 
-        private void ParseDeclaration()
+        private IDeclarationNode ParseDeclaration()
         {
             Debugger.Write("Parsing Declaration");
-            //List<IDeclarationNode> declarations = new List<IDeclarationNode>();
-            //declarations.Add(ParseSingleDeclaration());
-            ParseSingleDeclaration();
+            List<IDeclarationNode> declarations = new List<IDeclarationNode>();
+            declarations.Add(ParseSingleDeclaration());
             while (CurrentToken.Type == Comma) // New
             {
                 Accept(Comma);
-                ParseSingleDeclaration();
-                //declarations.Add(ParseSingleDeclaration());
+                declarations.Add(ParseSingleDeclaration());
             }
-            //if (declarations.Count == 1) return declarations[0];
-            //return new SequentialDeclarationNode(declarations);
+            if (declarations.Count == 1) return declarations[0];
+            return new SequentialDeclarationNode(declarations);
         }
 
-        private void ParseSingleDeclaration()
+        private IDeclarationNode ParseSingleDeclaration()
         {
             Debugger.Write("Parsing Single Declaration");
-            ParseIdentifier();
+            Position pos = CurrentToken.Position;
+            IdentifierNode identifier = ParseIdentifier();
             switch (CurrentToken.Type)
             {
                 case Tilde:
-                    ParseConstDeclaration();
-                    break;
+                    Debugger.Write("Parsing Const Declaration");
+                    Accept(Tilde);
+                    IExpressionNode expression = ParseExpression();
+                    return new ConstDeclarationNode(identifier, expression, pos);
                 case Colon:
-                    ParseVarDeclaration();
-                    break;
+                    Debugger.Write("Parsing Var Declaration");
+                    Accept(Colon);
+                    TypeDenoterNode typeDenoter = ParseTypeDenoter();
+                    return new VarDeclarationNode(identifier, typeDenoter, pos);
                 default:
-                    Reporter.RecordError($"Token is not the expected token when Parsing Single Declaration: '{CurrentToken.Spelling}'", CurrentToken.Position);
-                    break;
-                    //return new ErrorNode(CurrentToken.Position);
+                    Reporter.RecordError($"Token is not the expected token when Parsing Single Declaration: " +
+                        $"'{CurrentToken.Spelling}'", pos);
+                    return new ErrorNode(pos);
             }
         }
 
-        private void ParseConstDeclaration() // Maybe need to put identifier in parameter
-        {
-            Debugger.Write("Parsing Const Declaration");
-            //Position pos = CurrentToken.Position;
-            //IdentifierNode identifier = ParseIdentifier();
-            Accept(Tilde);
-
-            //IExpressionNode expression = 
-            ParseExpression();
-            //return new ConstDeclarationNode(identifier, expression, pos);
-        }
-
-        private void ParseVarDeclaration()
-        {
-            Debugger.Write("Parsing Var Declaration");
-            //Position pos = CurrentToken.Position;
-            //IdentifierNode identifier = ParseIdentifier();
-            Accept(Colon);
-            //TypeDenoterNode typeDenoter = 
-            ParseTypeDenoter();
-            //return new VarDeclarationNode(identifier, typeDenoter, pos);
-        }
-
-        private void ParseParameter()
+        private IParameterNode ParseParameter()
         {
             Debugger.Write("Parsing Parameter");
-            //Position pos = CurrentToken.Position;
-            if (CurrentToken.Type == RightBracket) ; //return new BlankParameterNode(pos);
+            Position pos = CurrentToken.Position;
+            if (CurrentToken.Type == RightBracket) return new BlankParameterNode(pos);
             else if (CurrentToken.Type == Var)
             {
+                Debugger.Write("Parsing Var Parameter");
                 Accept(Var);
-                ParseIdentifier();
-                //VarParameterNode varParameter = new VarParameterNode(ParseIdentifier(), pos);
-                //return varParameter;
+                VarParameterNode varParameter = new VarParameterNode(ParseIdentifier(), pos);
+                return varParameter;
             }
             else
             {
-                ParseExpression();
-                //return new ExpressionParameterNode(ParseExpression());
+                Debugger.Write("Parsing Value Parameter");
+                return new ExpressionParameterNode(ParseExpression());
             }
         }
 
-        private void ParseTypeDenoter()
+        private TypeDenoterNode ParseTypeDenoter()
         {
             Debugger.Write("Parsing Type Denoter");
-            ParseIdentifier();
-            //TypeDenoterNode typeDenoter = new TypeDenoterNode(ParseIdentifier());
-            //return typeDenoter;
+            TypeDenoterNode typeDenoter = new TypeDenoterNode(ParseIdentifier());
+            return typeDenoter;
         }
 
         /// <summary>
         /// Parses an expression
         /// </summary>
-        private void ParseExpression()
+        private IExpressionNode ParseExpression()
         {
             Debugger.Write("Parsing Expression");
-            //IExpressionNode expression = 
-            ParsePrimaryExpression();
+            IExpressionNode expression = ParsePrimaryExpression();
             while (CurrentToken.Type == Operator)
             {
-                //OperatorNode oper = 
-                ParseOperator();
-                //IExpressionNode rightExpression = 
-                ParsePrimaryExpression();
-                //expression = new BinaryExpressionNode(expression, oper, rightExpression);
+                OperatorNode oper = ParseOperator();
+                IExpressionNode rightExpression = ParsePrimaryExpression();
+                expression = new BinaryExpressionNode(expression, oper, rightExpression);
             }
-            //return expression;
+            return expression;
         }
 
-        private void ParsePrimaryExpression()
+        private IExpressionNode ParsePrimaryExpression()
         {
             Debugger.Write("Parsing Primary Expression");
-            //Position pos = CurrentToken.Position;
             switch (CurrentToken.Type)
             {
                 case IntLiteral:
-                    ParseIntLiteral();
-                    break;
-                    //return new IntegerExpressionNode(ParseIntLiteral());
+                    return new IntegerExpressionNode(ParseIntLiteral());
                 case CharLiteral:
-                    //return new CharacterExpressionNode(ParseCharLiteral());
-                    ParseCharLiteral();
-                    break;
+                    return new CharacterExpressionNode(ParseCharLiteral());
                 case Identifier:
-                    //return new IdExpressionNode(ParseIdentifier());
-                    ParseIdentifier();
+                    IdentifierNode identifier = ParseIdentifier();
                     if (CurrentToken.Type == LeftBracket) // New
                     {
                         Accept(LeftBracket);
-                        ParseParameter();
+                        IParameterNode parameter = ParseParameter();
                         Accept(RightBracket);
-                    }
-                    break;
+                        return new CallExpressionNode(identifier, parameter);
+                    } 
+                    else
+                        return new IdExpressionNode(identifier);
                 case Operator:
-                    //return new UnaryExpressionNode(ParseOperator(), ParsePrimaryExpression());
-                    ParseOperator();
-                    ParsePrimaryExpression();
-                    break;
+                    return new UnaryExpressionNode(ParseOperator(), ParsePrimaryExpression());
                 case LeftBracket:
                     Accept(LeftBracket);
-                    //IExpressionNode expression = 
-                    ParseExpression();
+                    IExpressionNode expression = ParseExpression();
                     Accept(RightBracket);
-                    //return expression;
-                    break;
+                    return expression;
                 default:
-                    Reporter.RecordError($"Token is not the expected token when Parsing Primary Expression: '{CurrentToken.Spelling}'", CurrentToken.Position);
-                    //return new ErrorNode(pos);
-                    break;
+                    Reporter.RecordError($"Token is not the expected token when Parsing Primary Expression: " +
+                        $"'{CurrentToken.Spelling}'", CurrentToken.Position);
+                    return new ErrorNode(CurrentToken.Position);
             }
         }
 
-        private void ParseOperator()
+        private OperatorNode ParseOperator()
         {
             Debugger.Write("Parsing operator");
-            //Token OperatorToken = CurrentToken;
+            Token OperatorToken = CurrentToken;
             Accept(Operator);
-            //return new OperatorNode(OperatorToken);
+            return new OperatorNode(OperatorToken);
         }
 
-        private void ParseIntLiteral()
+        private IntegerLiteralNode ParseIntLiteral()
         {
             Debugger.Write("Parsing integer literal");
-            //Token IntLitToken = CurrentToken;
+            Token IntLitToken = CurrentToken;
             Accept(IntLiteral);
-            //return new IntegerLiteralNode(IntLitToken);
+            return new IntegerLiteralNode(IntLitToken);
         }
 
-        private void ParseCharLiteral()
+        private CharacterLiteralNode ParseCharLiteral()
         {
             Debugger.Write("Parsing character literal");
-            //Token CharLitToken = CurrentToken;
+            Token CharLitToken = CurrentToken;
             Accept(CharLiteral);
-            //return new CharacterLiteralNode(CharLitToken);
+            return new CharacterLiteralNode(CharLitToken);
         }
 
         /// <summary>
         /// Parses an identifier
         /// </summary>
-        private void ParseIdentifier()
+        private IdentifierNode ParseIdentifier()
         {
             Debugger.Write("Parsing identifier");
-            //Token IdentifierToken = CurrentToken;
+            Token IdentifierToken = CurrentToken;
             Accept(Identifier);
-            //return new IdentifierNode(IdentifierToken);
+            return new IdentifierNode(IdentifierToken);
         }
     }
 }
