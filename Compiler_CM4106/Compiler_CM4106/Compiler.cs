@@ -2,7 +2,7 @@
 using Compiler.IO;
 //using Compiler.Nodes;
 //using Compiler.SemanticAnalysis;
-//using Compiler.SyntacticAnalysis;
+using Compiler.SyntacticAnalysis;
 using Compiler.Tokenization;
 using System.Collections.Generic;
 using System.IO;
@@ -33,7 +33,7 @@ namespace Compiler
         /// <summary>
         /// The parser
         /// </summary>
-        //public Parser Parser { get; }
+        public Parser Parser { get; }
 
         ///// <summary>
         ///// The identifier
@@ -66,7 +66,7 @@ namespace Compiler
             Reporter = new ErrorReporter();
             Reader = new FileReader(inputFile);
             Tokenizer = new Tokenizer(Reader, Reporter);
-            //Parser = new Parser(Reporter);
+            Parser = new Parser(Reporter);
             //Identifier = new DeclarationIdentifier(Reporter);
             //Checker = new TypeChecker(Reporter);
             //Generator = new CodeGenerator(Reporter);
@@ -85,11 +85,12 @@ namespace Compiler
             WriteLine("Done");
             //WriteLine(string.Join("\n", tokens));
 
-            //// Parse
-            //Write("Parsing...");
-            //ProgramNode tree = Parser.Parse(tokens);
-            //if (Reporter.HasErrors) return;
-            //WriteLine("Done");
+            // Parse
+            Write("Parsing...");
+            ProgramNode tree = Parser.Parse(tokens);
+            if (Reporter.HasErrors) return;
+            WriteLine("Done");
+            WriteLine(TreePrinter.ToString(tree));
 
             //// Identify
             //Write("Identifying...");
