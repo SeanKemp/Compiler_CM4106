@@ -1,7 +1,7 @@
 ﻿using Compiler.CodeGeneration;
 using Compiler.IO;
 using Compiler.Nodes;
-//using Compiler.SemanticAnalysis;
+using Compiler.SemanticAnalysis;
 using Compiler.SyntacticAnalysis;
 using Compiler.Tokenization;
 using System.Collections.Generic;
@@ -35,10 +35,10 @@ namespace Compiler
         /// </summary>
         public Parser Parser { get; }
 
-        ///// <summary>
-        ///// The identifier
-        ///// </summary>
-        //public DeclarationIdentifier Identifier { get; }
+        /// <summary>
+        /// The identifier
+        /// </summary>
+        public DeclarationIdentifier Identifier { get; }
 
         ///// <summary>
         ///// The type checker
@@ -67,7 +67,7 @@ namespace Compiler
             Reader = new FileReader(inputFile);
             Tokenizer = new Tokenizer(Reader, Reporter);
             Parser = new Parser(Reporter);
-            //Identifier = new DeclarationIdentifier(Reporter);
+            Identifier = new DeclarationIdentifier(Reporter);
             //Checker = new TypeChecker(Reporter);
             //Generator = new CodeGenerator(Reporter);
             //Writer = new TargetCodeWriter(binaryOutputFile, textOutputFile, Reporter);
@@ -90,13 +90,13 @@ namespace Compiler
             ProgramNode tree = Parser.Parse(tokens);
             if (Reporter.HasErrors) return;
             WriteLine("Done");
-            WriteLine(TreePrinter.ToString(tree));
 
-            //// Identify
-            //Write("Identifying...");
-            //Identifier.PerformIdentification(tree);
-            //if (Reporter.HasErrors) return;
-            //WriteLine("Done");
+            // Identify
+            Write("Identifying...");
+            Identifier.PerformIdentification(tree);
+            if (Reporter.HasErrors) return;
+            WriteLine("Done");
+            WriteLine(TreePrinter.ToString(tree));
 
             //// Type check
             //Write("Type Checking...");
