@@ -2,7 +2,7 @@
   "profiles": {
     "Compiler": {
       "commandName": "Project",
-      "commandLineArgs": "example_chars.tri out.tam out.txt",
+      "commandLineArgs": "test_program1.tri out.tam out.txt",
       "workingDirectory": "../"
     }
   }
