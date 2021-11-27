@@ -116,7 +116,7 @@ namespace Compiler.SyntacticAnalysis
             switch (CurrentToken.Type)
             {
                 case Nothing:
-                    return ParseNothingCommand();
+                    return ParseBlankCommand();
                 case Identifier:
                     return ParseAssignmentOrCallCommand();
                 case If:
@@ -135,11 +135,11 @@ namespace Compiler.SyntacticAnalysis
             }
         }
 
-        private NothingCommandNode ParseNothingCommand() // New
+        private BlankCommandNode ParseBlankCommand() // New
         {
-            Debugger.Write("Parsing Nothing Command");
+            Debugger.Write("Parsing Blank Command");
             Accept(Nothing);
-            return new NothingCommandNode(CurrentToken.Position);
+            return new BlankCommandNode(CurrentToken.Position);
         }
 
         /// <summary>

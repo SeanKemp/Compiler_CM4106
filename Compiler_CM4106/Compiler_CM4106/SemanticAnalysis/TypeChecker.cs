@@ -67,10 +67,10 @@ namespace Compiler.SemanticAnalysis
         }
 
         /// <summary>
-        /// Carries out type checking on a nothing command node
+        /// Carries out type checking on a blank command node
         /// </summary>
-        /// <param name="nothingCommand">The node to perform type checking on</param>
-        private void PerformTypeCheckingOnNothingCommand(NothingCommandNode nothingCommand)
+        /// <param name="blankCommand">The node to perform type checking on</param>
+        private void PerformTypeCheckingOnBlankCommand(BlankCommandNode blankCommand)
         {
         }
 

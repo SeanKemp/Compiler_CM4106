@@ -189,8 +189,8 @@ namespace Compiler.IO
                 case SequentialCommandNode sequentialCommand:
                     return NodeToString(lastChild, sequentialCommand, sequentialCommand.Commands.ToArray());
 
-                case NothingCommandNode nothingCommand:
-                    return NodeToString(lastChild, nothingCommand);
+                case BlankCommandNode blankCommand:
+                    return NodeToString(lastChild, blankCommand);
 
                 case WhileCommandNode whileCommand:
                     return NodeToString(lastChild, whileCommand, whileCommand.Expression, whileCommand.Command);

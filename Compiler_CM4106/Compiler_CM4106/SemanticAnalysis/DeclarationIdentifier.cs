@@ -79,10 +79,10 @@ namespace Compiler.SemanticAnalysis
         }
 
         /// <summary>
-        /// Carries out identification on a nothing command node
+        /// Carries out identification on a blank command node
         /// </summary>
-        /// <param name="nothingCommand">The node to perform identification on</param>
-        private void PerformIdentificationOnNothingCommand(NothingCommandNode nothingCommand)
+        /// <param name="blankCommand">The node to perform identification on</param>
+        private void PerformIdentificationOnBlankCommand(BlankCommandNode blankCommand)
         {
         }
 
