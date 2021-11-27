@@ -394,7 +394,12 @@ namespace Compiler.SemanticAnalysis
             // Check identifier is a function and checking arguments of the function
             if (!(callExpression.Identifier.Declaration is FunctionDeclarationNode functionDeclaration))
             {
-                Reporter.RecordError("CallExpression identifier is not a function", callExpression.Position);
+                Reporter.RecordError("CallExpression identifier is not a function or procedure", callExpression.Position);
+            }
+            // The call must be to a function, not a procedure, so must not return Void
+            else if (GetReturnType(functionDeclaration.Type) == StandardEnvironment.VoidType)
+            {
+                Reporter.RecordError("CallExpression function must return a value", callExpression.Position);
             }
             else if (GetNumberOfArguments(functionDeclaration.Type) == 0)
             {
