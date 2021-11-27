@@ -377,6 +377,6 @@ namespace Compiler.CodeGeneration
         /// <summary>
         /// The address to use for the first instruction
         /// </summary>
-        //public static Address CodeBase { get; } = 0;
+        public static Address CodeBase { get; } = 0;
     }
 }

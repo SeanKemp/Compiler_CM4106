@@ -64,9 +64,7 @@ namespace Compiler.SemanticAnalysis
                 Scopes.Peek().Add(symbol, declaration);
                 Debugger.Write($"Successfully added {symbol} to the current scope");
                 return true;
-            } 
-
-            return false;
+            }
         }
 
         /// <summary>
@@ -88,7 +86,6 @@ namespace Compiler.SemanticAnalysis
                 }
             }
             Debugger.Write($"{symbol} is not in the symbol table");
-
             return null;
         }
 
