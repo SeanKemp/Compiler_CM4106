@@ -57,8 +57,6 @@ namespace Compiler.SemanticAnalysis
             }
         }
 
-
-
         /// <summary>
         /// Carries out type checking on a program node
         /// </summary>
@@ -66,29 +64,6 @@ namespace Compiler.SemanticAnalysis
         private void PerformTypeCheckingOnProgram(ProgramNode programNode)
         {
             PerformTypeChecking(programNode.Command);
-        }
-
-
-
-        /// <summary>
-        /// Carries out type checking on an assign command node
-        /// </summary>
-        /// <param name="assignCommand">The node to perform type checking on</param>
-        private void PerformTypeCheckingOnAssignCommand(AssignCommandNode assignCommand)
-        {
-            PerformTypeChecking(assignCommand.Identifier);
-            PerformTypeChecking(assignCommand.Expression);
-
-            // Check identifier is a variable
-            if (!(assignCommand.Identifier.Declaration is IVariableDeclarationNode variable))
-            {
-                Reporter.RecordError("Assigning identifier is not a variable", assignCommand.Position);
-            }
-            else if (variable.EntityType != assignCommand.Expression.Type)
-            {
-                Reporter.RecordError("Assign identifier is not the same type as expression", assignCommand.Position);
-            }
-            // Check identifier and expression have same type
         }
 
         /// <summary>
@@ -100,6 +75,26 @@ namespace Compiler.SemanticAnalysis
         }
 
         /// <summary>
+        /// Carries out type checking on an assign command node
+        /// </summary>
+        /// <param name="assignCommand">The node to perform type checking on</param>
+        private void PerformTypeCheckingOnAssignCommand(AssignCommandNode assignCommand)
+        {
+            PerformTypeChecking(assignCommand.Identifier);
+            PerformTypeChecking(assignCommand.Expression);
+
+            // Check identifier is a variable and is the correct type
+            if (!(assignCommand.Identifier.Declaration is IVariableDeclarationNode variable))
+            {
+                Reporter.RecordError("Assigning identifier is not a variable", assignCommand.Position);
+            }
+            else if (variable.EntityType != assignCommand.Expression.Type)
+            {
+                Reporter.RecordError("Assign identifier is not the same type as expression", assignCommand.Position);
+            }
+        }
+
+        /// <summary>
         /// Carries out type checking on a call command node
         /// </summary>
         /// <param name="callCommand">The node to perform type checking on</param>
@@ -108,7 +103,7 @@ namespace Compiler.SemanticAnalysis
             PerformTypeChecking(callCommand.Identifier);
             PerformTypeChecking(callCommand.Parameter);
 
-            // Check identifier is a function
+            // Check identifier is a function and checking arguments of the function
             if (!(callCommand.Identifier.Declaration is FunctionDeclarationNode functionDeclaration))
             {
                 Reporter.RecordError("CallCommand identifier is not a function", callCommand.Position);
@@ -117,7 +112,7 @@ namespace Compiler.SemanticAnalysis
             {
                 if (!(callCommand.Parameter is BlankParameterNode))
                 {
-                    Reporter.RecordError("Zero Argument Function parameter is not blank", callCommand.Position);
+                    Reporter.RecordError("Function must have zero parameters", callCommand.Position);
                 }
 
             } 
@@ -125,7 +120,7 @@ namespace Compiler.SemanticAnalysis
             {
                 if (callCommand.Parameter is BlankParameterNode)
                 {
-                    Reporter.RecordError("One Argument Function parameter is blank", callCommand.Position);
+                    Reporter.RecordError("Function must have one parameter argument", callCommand.Position);
                 }
                 else
                 {
@@ -137,14 +132,14 @@ namespace Compiler.SemanticAnalysis
                     {
                         if (!(callCommand.Parameter is VarParameterNode))
                         {
-                            Reporter.RecordError("Passed by Reference parameter is not a VarParameter", callCommand.Position);
+                            Reporter.RecordError("Passed by Reference parameter was not a Var Parameter", callCommand.Position);
                         }
                     } 
                     else
                     {
                         if (!(callCommand.Parameter is ExpressionParameterNode))
                         {
-                            Reporter.RecordError("Passed by value parameter is not a ExpressionParameter", callCommand.Position);
+                            Reporter.RecordError("Passed by value parameter was not an Expression Parameter", callCommand.Position);
                         }
                     }
                 }
@@ -163,7 +158,46 @@ namespace Compiler.SemanticAnalysis
 
             // Check the expression type is boolean
             if (ifCommand.Expression.Type != StandardEnvironment.BooleanType)
-                Reporter.RecordError("if Expression is not a boolean value", ifCommand.Position);
+                Reporter.RecordError("if Expression must be a boolean value", ifCommand.Position);
+        }
+
+        /// <summary>
+        /// Carries out type checking on a while command node
+        /// </summary>
+        /// <param name="whileCommand">The node to perform type checking on</param>
+        private void PerformTypeCheckingOnWhileCommand(WhileCommandNode whileCommand)
+        {
+            PerformTypeChecking(whileCommand.Expression);
+            PerformTypeChecking(whileCommand.Command);
+
+            // Check the expression type is boolean
+            if (whileCommand.Expression.Type != StandardEnvironment.BooleanType)
+                Reporter.RecordError("While Expression is not a boolean value", whileCommand.Position);
+        }
+
+        /// <summary>
+        /// Carries out type checking on a while forever command node
+        /// </summary>
+        /// <param name="whileForeverCommand">The node to perform type checking on</param>
+        private void PerformTypeCheckingOnWhileForeverCommand(WhileCommandNode whileForeverCommand)
+        {
+            PerformTypeChecking(whileForeverCommand.Command);
+        }
+
+        /// <summary>
+        /// Carries out type checking on an if command node
+        /// </summary>
+        /// <param name="forCommand">The node to perform type checking on</param>
+        private void PerformTypeCheckingOnForCommand(ForCommandNode forCommand)
+        {
+            PerformTypeChecking(forCommand.FirstCommand);
+            PerformTypeChecking(forCommand.Expression);
+            PerformTypeChecking(forCommand.SecondCommand);
+            PerformTypeChecking(forCommand.DoCommand);
+
+            // Check the expression type is boolean
+            if (forCommand.Expression.Type != StandardEnvironment.BooleanType)
+                Reporter.RecordError("for Expression must be a boolean value", forCommand.Position);
         }
 
         /// <summary>
@@ -185,22 +219,6 @@ namespace Compiler.SemanticAnalysis
             foreach (ICommandNode command in sequentialCommand.Commands)
                 PerformTypeChecking(command);
         }
-
-        /// <summary>
-        /// Carries out type checking on a while command node
-        /// </summary>
-        /// <param name="whileCommand">The node to perform type checking on</param>
-        private void PerformTypeCheckingOnWhileCommand(WhileCommandNode whileCommand)
-        {
-            PerformTypeChecking(whileCommand.Expression);
-            PerformTypeChecking(whileCommand.Command);
-
-            // Check the expression type is boolean
-            if (whileCommand.Expression.Type != StandardEnvironment.BooleanType)
-                Reporter.RecordError("While Expression is not a boolean value", whileCommand.Position);
-        }
-
-
 
         /// <summary>
         /// Carries out type checking on a const declaration node
@@ -232,7 +250,57 @@ namespace Compiler.SemanticAnalysis
             PerformTypeChecking(varDeclaration.Identifier);
         }
 
+        /// <summary>
+        /// Carries out type checking on a blank parameter
+        /// </summary>
+        /// <param name="blankParameter">The node to perform type checking on</param>
+        private void PerformTypeCheckingOnBlankParameter(BlankParameterNode blankParameter)
+        {
+        }
 
+        /// <summary>
+        /// Carries out type checking on an expression parameter node
+        /// </summary>
+        /// <param name="expressionParameter">The node to perform type checking on</param>
+        private void PerformTypeCheckingOnExpressionParameter(ExpressionParameterNode expressionParameter)
+        {
+            PerformTypeChecking(expressionParameter.Expression);
+            // Set the node's type to be the type of the expression
+            expressionParameter.Type = expressionParameter.Expression.Type;
+        }
+
+        /// <summary>
+        /// Carries out type checking on a var parameter node
+        /// </summary>
+        /// <param name="varParameter">The node to perform type checking on</param>
+        private void PerformTypeCheckingOnVarParameter(VarParameterNode varParameter)
+        {
+            PerformTypeChecking(varParameter.Identifier);
+            // Check the identifier is a variable
+            if (!(varParameter.Identifier.Declaration is IVariableDeclarationNode variable))
+            {
+                Reporter.RecordError("Type in VarParameter is not a variable", varParameter.Position);
+            }
+            else // Set the node's type to be the type of the identifier 
+                varParameter.Type = variable.EntityType;
+        }
+
+        /// <summary>
+        /// Carries out type checking on a type denoter node
+        /// </summary>
+        /// <param name="typeDenoter">The node to perform type checking on</param>
+        private void PerformTypeCheckingOnTypeDenoter(TypeDenoterNode typeDenoter)
+        {
+            PerformTypeChecking(typeDenoter.Identifier);
+
+            // Check the identifier is a type
+            if (!(typeDenoter.Identifier.Declaration is SimpleTypeDeclarationNode declaration))
+            {
+                Reporter.RecordError("Type of TypeDenoter identifier was not an expected type", typeDenoter.Position);
+            }
+            else // Set the node's type to be the declaration of the identifier 
+                typeDenoter.Type = declaration;
+        }
 
         /// <summary>
         /// Carries out type checking on a binary expression node
@@ -244,7 +312,7 @@ namespace Compiler.SemanticAnalysis
             PerformTypeChecking(binaryExpression.LeftExpression);
             PerformTypeChecking(binaryExpression.RightExpression);
 
-            // Check the operator is a binary operation
+            // Check the operator is a binary operation and if the operator, left and right expression types match
             if (!(binaryExpression.Op.Declaration is BinaryOperationDeclarationNode opDeclaration))
             {
                 Reporter.RecordError("BinaryExpression operator is not a binary operation", binaryExpression.Position);
@@ -269,17 +337,20 @@ namespace Compiler.SemanticAnalysis
                         Reporter.RecordError("Right hand expression is wrong type", binaryExpression.Position);
                     }
                 }
+                // Set the node's type to be the return type of the operation
                 binaryExpression.Type = GetReturnType(opDeclaration.Type);
             }
+        }
 
-            // If the operation can take any type as arguments
-            //    Check the left and right expressons have the same type
-
-            // Else
-            //    Check the left expression has the same type as expected by the first argument of the operation
-            //    Check the right expression has the same type as expected by the second argument of the operation
-
-            // Set the node's type to the return type of the operation
+        /// <summary>
+        /// Carries out type checking on a  node
+        /// </summary>
+        /// <param name="integerExpression">The node to perform type checking on</param>
+        private void PerformTypeCheckingOnIntegerExpression(IntegerExpressionNode integerExpression)
+        {
+            PerformTypeChecking(integerExpression.IntLit);
+            // Set the node's type to be integer
+            integerExpression.Type = StandardEnvironment.IntegerType;
         }
 
         /// <summary>
@@ -289,8 +360,8 @@ namespace Compiler.SemanticAnalysis
         private void PerformTypeCheckingOnCharacterExpression(CharacterExpressionNode characterExpression)
         {
             PerformTypeChecking(characterExpression.CharLit);
-            characterExpression.Type = StandardEnvironment.CharType;
             // Set the node's type to be character
+            characterExpression.Type = StandardEnvironment.CharType;
         }
 
         /// <summary>
@@ -306,20 +377,65 @@ namespace Compiler.SemanticAnalysis
             {
                 Reporter.RecordError("Identifier is not a variable or constant", idExpression.Position);
             }
-            else idExpression.Type = declaration.EntityType;
-            // Set the node's type to be the same as the identifier
-
+            else // Set the node's type to be the same as the identifier 
+                idExpression.Type = declaration.EntityType;
+            
         }
 
         /// <summary>
-        /// Carries out type checking on a  node
+        /// Carries out type checking on a call expression node
         /// </summary>
-        /// <param name="integerExpression">The node to perform type checking on</param>
-        private void PerformTypeCheckingOnIntegerExpression(IntegerExpressionNode integerExpression)
+        /// <param name="callExpression">The node to perform type checking on</param>
+        private void PerformTypeCheckingOnCallExpression(CallExpressionNode callExpression)
         {
-            PerformTypeChecking(integerExpression.IntLit);
-            integerExpression.Type = StandardEnvironment.IntegerType;
-            // Set the node's type to be integer
+            PerformTypeChecking(callExpression.Identifier);
+            PerformTypeChecking(callExpression.Parameter);
+
+            // Check identifier is a function and checking arguments of the function
+            if (!(callExpression.Identifier.Declaration is FunctionDeclarationNode functionDeclaration))
+            {
+                Reporter.RecordError("CallExpression identifier is not a function", callExpression.Position);
+            }
+            else if (GetNumberOfArguments(functionDeclaration.Type) == 0)
+            {
+                if (!(callExpression.Parameter is BlankParameterNode))
+                {
+                    Reporter.RecordError("Function must have zero parameters", callExpression.Position);
+                }
+                // Set the node's type to be the return type of the function
+                callExpression.Type = GetReturnType(functionDeclaration.Type);
+            }
+            else if (GetNumberOfArguments(functionDeclaration.Type) == 1)
+            {
+                if (callExpression.Parameter is BlankParameterNode)
+                {
+                    Reporter.RecordError("Function must have one parameter argument", callExpression.Position);
+                }
+                else
+                {
+                    // Checking function parameter type matches with given parameter
+                    if (GetArgumentType(functionDeclaration.Type, 0) != callExpression.Parameter.Type)
+                    {
+                        Reporter.RecordError("Function parameter type was not expected", callExpression.Position);
+                    }
+                    if (ArgumentPassedByReference(functionDeclaration.Type, 0))
+                    {
+                        if (!(callExpression.Parameter is VarParameterNode))
+                        {
+                            Reporter.RecordError("Passed by Reference parameter was not a Var Parameter", callExpression.Position);
+                        }
+                    }
+                    else
+                    {
+                        if (!(callExpression.Parameter is ExpressionParameterNode))
+                        {
+                            Reporter.RecordError("Passed by value parameter was not an Expression Parameter", callExpression.Position);
+                        }
+                    }
+                }
+                // Set the node's type to be the return type of the function
+                callExpression.Type = GetReturnType(functionDeclaration.Type);
+            }
         }
 
         /// <summary>
@@ -331,7 +447,7 @@ namespace Compiler.SemanticAnalysis
             PerformTypeChecking(unaryExpression.Op);
             PerformTypeChecking(unaryExpression.Expression);
 
-            // Check the operation is a unary expression
+            // Check the operation is a unary expression and correct type
             if (!(unaryExpression.Op.Declaration is UnaryOperationDeclarationNode opDeclaration))
             {
                 Reporter.RecordError("UnaryOpDeclaration operator is not a unary operator", unaryExpression.Position);
@@ -342,77 +458,31 @@ namespace Compiler.SemanticAnalysis
                 {
                     Reporter.RecordError("Expected argument type does not match expression type", unaryExpression.Position);
                 }
+                // Set the node's type to be the return type of the operation
                 unaryExpression.Type = GetReturnType(opDeclaration.Type);
             }
-
-            // Check the expected argument for the operation and the expession are the same type
-
-            // Set the node's type to be the return type of the operation
         }
 
-
-
         /// <summary>
-        /// Carries out type checking on a blank parameter
+        /// Carries out type checking on an operation node
         /// </summary>
-        /// <param name="blankParameter">The node to perform type checking on</param>
-        private void PerformTypeCheckingOnBlankParameter(BlankParameterNode blankParameter)
+        /// <param name="operation">The node to perform type checking on</param>
+        private void PerformTypeCheckingOnOperator(OperatorNode operation)
         {
         }
 
         /// <summary>
-        /// Carries out type checking on an expression parameter node
+        /// Carries out type checking on an integer literal node
         /// </summary>
-        /// <param name="expressionParameter">The node to perform type checking on</param>
-        private void PerformTypeCheckingOnExpressionParameter(ExpressionParameterNode expressionParameter)
+        /// <param name="integerLiteral">The node to perform type checking on</param>
+        private void PerformTypeCheckingOnIntegerLiteral(IntegerLiteralNode integerLiteral)
         {
-            PerformTypeChecking(expressionParameter.Expression);
-            expressionParameter.Type = expressionParameter.Expression.Type;
-            // Set the node's type to be the type of the expression
-            //if (!(expressionParameter.Type is IExpressionNode expression))
-            //{
-            //    Reporter.RecordError("Parameter expression is not the expected type", expressionParameter.Position);
-            //}
-            //else expressionParameter.Type = expression.Type;
-
-        }   
-
-        /// <summary>
-        /// Carries out type checking on a var parameter node
-        /// </summary>
-        /// <param name="varParameter">The node to perform type checking on</param>
-        private void PerformTypeCheckingOnVarParameter(VarParameterNode varParameter)
-        {
-            PerformTypeChecking(varParameter.Identifier);
-            if (!(varParameter.Identifier.Declaration is IVariableDeclarationNode variable))
+            // Check the value is between short.MinValue and short.MaxValue
+            if (integerLiteral.Value < short.MinValue || integerLiteral.Value > short.MaxValue)
             {
-                Reporter.RecordError("Type in VarParameter is not a variable", varParameter.Position);
+                Reporter.RecordError("Integer Literal value is out of scope", integerLiteral.Position);
             }
-            else varParameter.Type = variable.EntityType;
-            // Check the identifier is a variable
-            // Set the node's type to be the type of the identifier
         }
-
-
-
-        /// <summary>
-        /// Carries out type checking on a type denoter node
-        /// </summary>
-        /// <param name="typeDenoter">The node to perform type checking on</param>
-        private void PerformTypeCheckingOnTypeDenoter(TypeDenoterNode typeDenoter)
-        {
-            PerformTypeChecking(typeDenoter.Identifier);
-
-            // Check the identifier is a type
-            if (!(typeDenoter.Identifier.Declaration is SimpleTypeDeclarationNode declaration))
-            {
-                Reporter.RecordError("Type of TypeDenoter was not an expected type", typeDenoter.Position);
-            }
-            else typeDenoter.Type = declaration;
-            // Set the node's type to be the _declaration_ of the identifier
-        }
-
-
 
         /// <summary>
         /// Carries out type checking on a character literal node
@@ -434,29 +504,6 @@ namespace Compiler.SemanticAnalysis
         private void PerformTypeCheckingOnIdentifier(IdentifierNode identifier)
         {
         }
-
-        /// <summary>
-        /// Carries out type checking on an integer literal node
-        /// </summary>
-        /// <param name="integerLiteral">The node to perform type checking on</param>
-        private void PerformTypeCheckingOnIntegerLiteral(IntegerLiteralNode integerLiteral)
-        {
-            // Check the value is between short.MinValue and short.MaxValue
-            if (integerLiteral.Value < short.MinValue || integerLiteral.Value > short.MaxValue)
-            {
-                Reporter.RecordError("Integer Literal value is out of scope", integerLiteral.Position);
-            }
-        }
-
-        /// <summary>
-        /// Carries out type checking on an operation node
-        /// </summary>
-        /// <param name="operation">The node to perform type checking on</param>
-        private void PerformTypeCheckingOnOperator(OperatorNode operation)
-        {
-        }
-
-
 
         /// <summary>
         /// Gets the number of arguments that a function takes

@@ -40,10 +40,10 @@ namespace Compiler
         /// </summary>
         public DeclarationIdentifier Identifier { get; }
 
-        ///// <summary>
-        ///// The type checker
-        ///// </summary>
-        //public TypeChecker Checker { get; }
+        /// <summary>
+        /// The type checker
+        /// </summary>
+        public TypeChecker Checker { get; }
 
         ///// <summary>
         ///// The code generator
@@ -68,7 +68,7 @@ namespace Compiler
             Tokenizer = new Tokenizer(Reader, Reporter);
             Parser = new Parser(Reporter);
             Identifier = new DeclarationIdentifier(Reporter);
-            //Checker = new TypeChecker(Reporter);
+            Checker = new TypeChecker(Reporter);
             //Generator = new CodeGenerator(Reporter);
             //Writer = new TargetCodeWriter(binaryOutputFile, textOutputFile, Reporter);
         }
@@ -98,11 +98,12 @@ namespace Compiler
             WriteLine("Done");
             WriteLine(TreePrinter.ToString(tree));
 
-            //// Type check
-            //Write("Type Checking...");
-            //Checker.PerformTypeChecking(tree);
-            //if (Reporter.HasErrors) return;
-            //WriteLine("Done");
+            // Type check
+            Write("Type Checking...");
+            Checker.PerformTypeChecking(tree);
+            if (Reporter.HasErrors) return;
+            WriteLine("Done");
+            WriteLine(TreePrinter.ToString(tree));
 
             //// Code generation
             //Write("Generating code...");
