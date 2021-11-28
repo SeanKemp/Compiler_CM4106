@@ -179,7 +179,7 @@ namespace Compiler.SemanticAnalysis
         /// Carries out type checking on a while forever command node
         /// </summary>
         /// <param name="whileForeverCommand">The node to perform type checking on</param>
-        private void PerformTypeCheckingOnWhileForeverCommand(WhileCommandNode whileForeverCommand)
+        private void PerformTypeCheckingOnWhileForeverCommand(WhileForeverCommandNode whileForeverCommand)
         {
             PerformTypeChecking(whileForeverCommand.Command);
         }
