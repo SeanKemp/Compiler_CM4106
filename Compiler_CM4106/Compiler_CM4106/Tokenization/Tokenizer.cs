@@ -106,13 +106,7 @@ namespace Compiler.Tokenization
         private TokenType ScanToken()
         {
             TokenSpelling.Clear();
-            if (Reader.Current == default(char))
-            {
-                // Read the end of the file
-                TakeIt();
-                return TokenType.EndOfText;
-            }
-            else if (Char.IsLetter(Reader.Current)) // Identifier
+            if (Char.IsLetter(Reader.Current)) // Identifier
             {
                 TakeIt();
                 if (!(Char.IsLetterOrDigit(Reader.Current)))
@@ -183,6 +177,12 @@ namespace Compiler.Tokenization
                 }
                 Reporter.RecordError($"Character literal '{Reader.Current}' is not allowed", Reader.CurrentPosition);
                 return TokenType.Error; 
+            }
+            else if (Reader.Current == default(char))
+            {
+                // Read the end of the file
+                TakeIt();
+                return TokenType.EndOfText;
             }
             else
             {
