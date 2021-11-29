@@ -137,27 +137,27 @@ namespace Compiler.Tokenization
                 TakeIt();
                 return TokenType.Operator;
             } 
-            else if (Reader.Current.Equals('('))
+            else if (Reader.Current.Equals('(')) // Left Bracket
             {
                 TakeIt();
                 return TokenType.LeftBracket;
             }
-            else if (Reader.Current.Equals(')'))
+            else if (Reader.Current.Equals(')')) // Right Bracket
             {
                 TakeIt();
                 return TokenType.RightBracket;
             }
-            else if (Reader.Current.Equals(',')) 
+            else if (Reader.Current.Equals(',')) // Comma
             {
                 TakeIt();
                 return TokenType.Comma;
             }
-            else if (Reader.Current.Equals('~'))
+            else if (Reader.Current.Equals('~')) // Tilde
             {
                 TakeIt();
                 return TokenType.Tilde;
             }
-            else if (Reader.Current.Equals(':'))
+            else if (Reader.Current.Equals(':')) // Colon
             {
                 TakeIt();
                 return TokenType.Colon;

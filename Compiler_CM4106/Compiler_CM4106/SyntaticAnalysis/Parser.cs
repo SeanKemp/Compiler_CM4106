@@ -135,7 +135,7 @@ namespace Compiler.SyntacticAnalysis
             }
         }
 
-        private BlankCommandNode ParseBlankCommand() // New
+        private BlankCommandNode ParseBlankCommand() 
         {
             Debugger.Write("Parsing Blank Command");
             Accept(Nothing);
@@ -188,7 +188,7 @@ namespace Compiler.SyntacticAnalysis
             Debugger.Write("Parsing While or While Forever Command");
             Position pos = CurrentToken.Position;
             Accept(While);
-            if (CurrentToken.Type != Forever) // New
+            if (CurrentToken.Type != Forever) 
             {
                 IExpressionNode expression = ParseExpression();
                 Accept(Do);
@@ -202,7 +202,7 @@ namespace Compiler.SyntacticAnalysis
             }
         }
 
-        private ForCommandNode ParseForCommand() // New
+        private ForCommandNode ParseForCommand() 
         {
             Debugger.Write("Parsing For Command");
             Position pos = CurrentToken.Position;
@@ -247,7 +247,7 @@ namespace Compiler.SyntacticAnalysis
             Debugger.Write("Parsing Declaration");
             List<IDeclarationNode> declarations = new List<IDeclarationNode>();
             declarations.Add(ParseSingleDeclaration());
-            while (CurrentToken.Type == Comma) // New
+            while (CurrentToken.Type == Comma) 
             {
                 Accept(Comma);
                 declarations.Add(ParseSingleDeclaration());
