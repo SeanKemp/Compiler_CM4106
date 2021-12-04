@@ -1,21 +1,9 @@
-$this is an example program
+$this is test program number 2
 let
 	MAX ~ 15,
-	n1: Integer,
-	gender: Char
+	n1: Integer
 in
 	begin
-		begin
-			put("e"), put("n"), put("t"), put("e"), put("r"), put(" "),
-			put("g"), put("e"), put("n"), put("d"), put("e"), put("r"), put(" "), 
-			put("m"), put("/"), put("f"), put(">"),
-			get(var gender)
-		end,
-		puteol(),
-		begin
-			put("G"), put("e"), put("n"), put("d"), put("e"), put("r"),
-			put(">"), put(" "), put(gender), puteol()
-		end,
 		put("e"), put("n"), put("t"), put("e"), put("r"), put(" "),
 		put("n"), put("u"), put("m"), put("b"), put("e"), put("r"), put(">"),
 		getint(var n1),
@@ -28,5 +16,8 @@ in
 					end
 			else nothing
 		else nothing,
-		put(chr(67))
+		puteol(),
+		put(chr(83)),
+		put(chr(75)),
+		puteol()
 	end

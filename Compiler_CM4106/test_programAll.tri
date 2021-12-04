@@ -1,0 +1,62 @@
+$this is a test program
+let
+	MAX ~ 15,
+	n1: Integer,
+	gender: Char
+in
+	begin
+		begin
+			put("e"), put("n"), put("t"), put("e"), put("r"), put(" "),
+			put("g"), put("e"), put("n"), put("d"), put("e"), put("r"), put(" "), 
+			put("m"), put("/"), put("f"), put(">"),
+			get(var gender)
+		end,
+		puteol(),
+		begin
+			put("G"), put("e"), put("n"), put("d"), put("e"), put("r"),
+			put(">"), put(" "), put(gender), puteol()
+		end,
+		put("e"), put("n"), put("t"), put("e"), put("r"), put(" "),
+		put("n"), put("u"), put("m"), put("b"), put("e"), put("r"), put(">"),
+		getint(var n1),
+		if n1 > 0 then
+			if n1 < MAX then
+				while n1 > 0 do
+					begin
+						putint(n1), puteol(),
+						n1 becomes n1-1
+					end
+			else nothing
+		else nothing,
+		puteol(),
+		put(chr(83)),
+		put(chr(75)),
+		puteol(),
+		for (n1 becomes 1, n1 < 21, n1 becomes n1+1)
+		do 
+			begin
+				putint(n1), put(" ")
+			end,
+		puteol(), puteol(),
+		let
+			n1: Integer,
+			n2: Integer,
+			sum: Integer
+		in
+			begin
+				n1 becomes 0,
+				n2 becomes 1,
+				while forever do 
+					begin
+						if \(n1 > 10000) then
+							begin
+								putint(n1),
+								sum becomes n1+n2,
+								n1 becomes n2,
+								n2 becomes sum,
+								puteol()
+							end
+						else nothing
+					end
+			end
+	end
