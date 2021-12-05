@@ -135,6 +135,9 @@ namespace Compiler.SyntacticAnalysis
             }
         }
 
+        /// <summary>
+        /// Parses a blank command
+        /// </summary>
         private BlankCommandNode ParseBlankCommand() 
         {
             Debugger.Write("Parsing Blank Command");
@@ -170,6 +173,9 @@ namespace Compiler.SyntacticAnalysis
             
         }
 
+        /// <summary>
+        /// Parses an if command
+        /// </summary>
         private IfCommandNode ParseIfCommand()
         {
             Debugger.Write("Parsing If Command");
@@ -183,6 +189,9 @@ namespace Compiler.SyntacticAnalysis
             return new IfCommandNode(expression, thenCommand, elseCommand, pos);
         }
 
+        /// <summary>
+        /// Parses a while or while forever command
+        /// </summary>
         private ICommandNode ParseWhileOrForeverCommand()
         {
             Debugger.Write("Parsing While or While Forever Command");
@@ -202,6 +211,9 @@ namespace Compiler.SyntacticAnalysis
             }
         }
 
+        /// <summary>
+        /// Parses a for command
+        /// </summary>
         private ForCommandNode ParseForCommand() 
         {
             Debugger.Write("Parsing For Command");
@@ -219,7 +231,10 @@ namespace Compiler.SyntacticAnalysis
             return new ForCommandNode(firstCommand, expression, secondCommand, doCommand, pos);
         }
 
-            private LetCommandNode ParseLetCommand()
+        /// <summary>
+        /// Parses a let command
+        /// </summary>
+        private LetCommandNode ParseLetCommand()
         {
             Debugger.Write("Parsing Let Command");
             Position pos = CurrentToken.Position;
@@ -242,6 +257,9 @@ namespace Compiler.SyntacticAnalysis
             return command;
         }
 
+        /// <summary>
+        /// Parses a declaration
+        /// </summary>
         private IDeclarationNode ParseDeclaration()
         {
             Debugger.Write("Parsing Declaration");
@@ -256,6 +274,9 @@ namespace Compiler.SyntacticAnalysis
             return new SequentialDeclarationNode(declarations);
         }
 
+        /// <summary>
+        /// Parses a single declaration
+        /// </summary>
         private IDeclarationNode ParseSingleDeclaration()
         {
             Debugger.Write("Parsing Single Declaration");
@@ -280,6 +301,9 @@ namespace Compiler.SyntacticAnalysis
             }
         }
 
+        /// <summary>
+        /// Parses a parameter
+        /// </summary>
         private IParameterNode ParseParameter()
         {
             Debugger.Write("Parsing Parameter");
@@ -294,11 +318,14 @@ namespace Compiler.SyntacticAnalysis
             }
             else
             {
-                Debugger.Write("Parsing Value Parameter");
+                Debugger.Write("Parsing Value/Expression Parameter");
                 return new ExpressionParameterNode(ParseExpression());
             }
         }
 
+        /// <summary>
+        /// Parses a type denoter
+        /// </summary>
         private TypeDenoterNode ParseTypeDenoter()
         {
             Debugger.Write("Parsing Type Denoter");
@@ -322,6 +349,9 @@ namespace Compiler.SyntacticAnalysis
             return expression;
         }
 
+        /// <summary>
+        /// Parses a primary expression
+        /// </summary>
         private IExpressionNode ParsePrimaryExpression()
         {
             Debugger.Write("Parsing Primary Expression");
@@ -333,7 +363,7 @@ namespace Compiler.SyntacticAnalysis
                     return new CharacterExpressionNode(ParseCharLiteral());
                 case Identifier:
                     IdentifierNode identifier = ParseIdentifier();
-                    if (CurrentToken.Type == LeftBracket) // New
+                    if (CurrentToken.Type == LeftBracket) // Call expression
                     {
                         Accept(LeftBracket);
                         IParameterNode parameter = ParseParameter();
@@ -356,6 +386,9 @@ namespace Compiler.SyntacticAnalysis
             }
         }
 
+        /// <summary>
+        /// Parses an operator
+        /// </summary>
         private OperatorNode ParseOperator()
         {
             Debugger.Write("Parsing operator");
@@ -364,6 +397,9 @@ namespace Compiler.SyntacticAnalysis
             return new OperatorNode(OperatorToken);
         }
 
+        /// <summary>
+        /// Parses an integer literal
+        /// </summary>
         private IntegerLiteralNode ParseIntLiteral()
         {
             Debugger.Write("Parsing integer literal");
@@ -372,6 +408,9 @@ namespace Compiler.SyntacticAnalysis
             return new IntegerLiteralNode(IntLitToken);
         }
 
+        /// <summary>
+        /// Parses a character literal
+        /// </summary>
         private CharacterLiteralNode ParseCharLiteral()
         {
             Debugger.Write("Parsing character literal");

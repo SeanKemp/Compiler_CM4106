@@ -61,7 +61,7 @@ namespace Compiler
         /// <param name="inputFile">The file containing the source code</param>
         /// <param name="binaryOutputFile">The file to write the binary target code to</param>
         /// <param name="textOutputFile">The file to write the text asembly code to</param>
-        public Compiler(string inputFile, string binaryOutputFile, string textOutputFile) //
+        public Compiler(string inputFile, string binaryOutputFile, string textOutputFile)
         {
             Reporter = new ErrorReporter();
             Reader = new FileReader(inputFile);
@@ -96,7 +96,7 @@ namespace Compiler
             Identifier.PerformIdentification(tree);
             if (Reporter.HasErrors) return;
             WriteLine("Done");
-            WriteLine(TreePrinter.ToString(tree));
+            //WriteLine(TreePrinter.ToString(tree));
 
             // Type check
             Write("Type Checking...");

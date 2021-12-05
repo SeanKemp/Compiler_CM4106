@@ -185,7 +185,7 @@ namespace Compiler.SemanticAnalysis
         }
 
         /// <summary>
-        /// Carries out type checking on an if command node
+        /// Carries out type checking on a for command node
         /// </summary>
         /// <param name="forCommand">The node to perform type checking on</param>
         private void PerformTypeCheckingOnForCommand(ForCommandNode forCommand)
